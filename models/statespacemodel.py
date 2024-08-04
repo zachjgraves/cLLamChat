@@ -9,9 +9,9 @@ from zeta.nn.modules.p_scan import pscan
 
 
 # Define Mamba block
-class MambaBlock(nn.Module):
+class SSMBlock(nn.Module):
     def __init__(self, n_features, n_states, expansion=1):
-        super(MambaBlock, self).__init__()
+        super(SSMBlock, self).__init__()
 
         # Set attributes
         self.n_features = n_features
@@ -119,6 +119,42 @@ class MambaBlock(nn.Module):
         # Return y
         return y
 
+
+# Define model class
+class SSMModel(nn.Module):
+    def __init__(self, n_features, n_states, n_layers, n_sequence=1024, expansion=1):
+        super(SSMModel, self).__init__()
+
+        # Set attributes
+        self.n_features = n_features
+        self.n_states = n_states
+        self.n_layers = n_layers
+        self.expansion = expansion
+
+        # Set up positional encoding
+        pos_embed = torch.zeros(n_sequence, n_features)
+        position = torch.arange(0, n_sequence).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, n_features, 2) * -(math.log(10000.0) / n_features))
+        pos_embed[:, 0::2] = torch.sin(position * div_term)
+        pos_embed[:, 1::2] = torch.cos(position * div_term)
+        pos_embed = pos_embed.unsqueeze(0)
+        self.register_buffer('pos_embed', pos_embed)
+
+        # Initialize Mamba blocks
+        self.blocks = nn.ModuleList([
+            SSMBlock(n_features, n_states, expansion) for _ in range(n_layers)
+        ])
+
+    def forward(self, x):
+
+        # Loop through blocks
+        for block in self.blocks:
+            x = block(x)
+
+        # Return x
+        return x
+
+
 # Test
 if __name__ == "__main__":
 
@@ -126,7 +162,7 @@ if __name__ == "__main__":
     x = torch.rand(32, 10, 512)
 
     # Create Mamba block
-    mamba_block = MambaBlock(512, 16)
+    mamba_block = SSMBlock(512, 16)
 
     # Test Mamba block
     y = mamba_block(x)
@@ -134,4 +170,3 @@ if __name__ == "__main__":
     # Done
     print("Done")
 
-    
