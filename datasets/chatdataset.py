@@ -8,8 +8,11 @@ from torch.utils.data import Dataset
 
 # Create a chat datset class
 class ChatDataset(Dataset):
-    def __init__(self,):
+    def __init__(self, context_window=1024):
         super(ChatDataset, self).__init__()
+
+        # Set attributes
+        self.context_window = context_window
 
         # Load datasets
         ds1 = load_dataset("yahma/alpaca-cleaned")
@@ -24,7 +27,7 @@ class ChatDataset(Dataset):
         data = self.data[idx]
 
         # output
-        return contextwindow, nextcharacter
+        return contextwindow
     
     def tokens2chars(self, tokens):
         return Error
