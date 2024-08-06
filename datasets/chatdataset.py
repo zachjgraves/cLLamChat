@@ -17,7 +17,8 @@ class ChatDataset(Dataset):
         if unknown_token is None:
             unknown_token = "❓"
         if vocab is None:
-            # This is a list of all characters the model can predict, including the stop token, and the unknown token
+            # This is a list of all characters the model can predict,
+            # including the stop token, and the unknown token
             vocab = (
                 list(" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
                 + [stop_token]
